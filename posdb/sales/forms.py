@@ -1,0 +1,45 @@
+# sales/forms.py
+
+from django import forms
+from .models import OrderItem
+
+
+class OrderItemForm(forms.ModelForm):
+    """One line item to add to an order."""
+    class Meta:
+        model  = OrderItem
+        fields = ['product', 'quantity']
+
+    def clean_quantity(self):
+        """Validation: quantity must be at least 1."""
+        qty = self.cleaned_data['quantity']
+        if qty < 1:
+            raise forms.ValidationError("Quantity must be at least 1.")
+        return qty
+    
+    def clean_product(self):
+        """Validation: product must be in stock."""
+        product = self.cleaned_data.get('product')
+
+        if product and product.stock == 0:
+            raise forms.ValidationError("This product is out of stock.")
+
+        return product
+    
+    def clean(self):
+        """
+        Validation:
+        quantity cannot be greater than stock.
+        """
+        cleaned_data = super().clean()
+
+        product = cleaned_data.get('product')
+        quantity = cleaned_data.get('quantity')
+
+        if product and quantity:
+            if quantity > product.stock:
+                raise forms.ValidationError(
+                    f"Only {product.stock} item(s) left in stock."
+                )
+
+        return cleaned_data

@@ -1,0 +1,196 @@
+<!-- sales/templates/sales/product_list.html -->
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <title>🛒 POS — បញ្ជីផលិតផល</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            max-width: 950px;
+            margin: 40px auto;
+            padding: 0 20px;
+            background: #f4f7fb;
+            font-weight: 500;
+        }
+
+        h1 {
+            color: #111827;
+            font-weight: 700;
+        }
+
+        /* NAV */
+        nav {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-bottom: 20px;
+        }
+
+        nav a {
+            margin-right: 16px;
+            color: #2563eb;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        /* CARD */
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin: 12px 0;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+
+            transition: 0.2s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.10);
+        }
+
+        .product-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .product-img {
+            width: 65px;
+            height: 65px;
+            border-radius: 12px;
+            object-fit: cover;
+            background: #e5e7eb;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        h2 a {
+            text-decoration: none;
+            color: #111827;
+            font-size: 1.05em;
+            font-weight: 700;
+        }
+
+        h2 a:hover {
+            color: #2563eb;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.75em;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .price {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #16a34a;
+        }
+
+        .stock {
+            font-size: 0.9em;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .low {
+            color: #dc2626;
+            font-weight: 700;
+        }
+
+        .empty {
+            color: #6b7280;
+            font-style: italic;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<h1>🛒 បញ្ជីផលិតផល</h1>
+
+<nav>
+    <a href="/sales/products/">Products</a>
+    <a href="/sales/orders/">Orders</a>
+    <a href="/sales/orders/new/">＋ New Order</a>
+    <a href="/admin/">Admin</a>
+
+    <span style="float:right">
+        👤 {{ request.user.username }}
+        <form method="post" action="/accounts/logout/" style="display:inline">
+            {% csrf_token %}
+            <button type="submit"
+                    style="background:none;border:none;color:#2563eb;font-weight:600;cursor:pointer;">
+                Log Out
+            </button>
+        </form>
+    </span>
+</nav>
+
+<p style="font-weight:600; color:#374151;">
+    {{ products|length }} ផលិតផល active ក្នុងប្រព័ន្ធ
+</p>
+
+{% for product in products %}
+<div class="product-card">
+
+    <div class="product-left">
+
+        {% if product.image %}
+            <img src="{{ product.image.url }}" class="product-img">
+        {% else %}
+            <div class="product-img"></div>
+        {% endif %}
+
+        <div>
+            <h2 style="margin:0;">
+                <a href="/sales/products/{{ product.pk }}/">{{ product.name }}</a>
+            </h2>
+
+            <span class="badge">{{ product.get_category_display }}</span>
+
+            {% if product.barcode %}
+                <div class="stock">Barcode: {{ product.barcode }}</div>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <div style="text-align:right">
+        <div class="price">${{ product.price }}</div>
+
+        {% if product.stock <= 5 %}
+            <div class="low">⚠️ ស្តុកទាប: {{ product.stock }}</div>
+        {% else %}
+            <div class="stock">ក្នុងស្តុក: {{ product.stock }}</div>
+        {% endif %}
+    </div>
+
+</div>
+{% empty %}
+    <p class="empty">មិនទាន់មានផលិតផលទេ — បន្ថែមតាម Admin!</p>
+{% endfor %}
+
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!-- sales/templates/sales/order_list.html -->
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <title>🧾 POS — ការបញ្ជាទិញ</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+            background: #f4f7fb;
+            color: #111827;
+        }
+
+        h1 {
+            font-weight: 700;
+        }
+
+        /* NAV */
+        nav {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+            margin-bottom: 20px;
+        }
+
+        nav a {
+            margin-right: 16px;
+            color: #2563eb;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        /* CARD TABLE */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        th {
+            background: #2563eb;
+            color: white;
+            padding: 14px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        td {
+            padding: 14px;
+            border-bottom: 1px solid #e5e7eb;
+            font-weight: 500;
+        }
+
+        tr:hover {
+            background: #f3f4f6;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* STATUS BADGES */
+        .paid {
+            background: #dcfce7;
+            color: #15803d;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 0.8em;
+        }
+
+        .open {
+            background: #fef3c7;
+            color: #b45309;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 0.8em;
+        }
+
+        .refunded {
+            background: #ede9fe;
+            color: #6d28d9;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 0.8em;
+        }
+
+        .cancelled {
+            background: #fee2e2;
+            color: #b91c1c;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 0.8em;
+            text-decoration: line-through;
+        }
+
+        /* INFO */
+        .info {
+            margin: 15px 0;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .empty {
+            text-align: center;
+            color: #6b7280;
+            padding: 20px;
+        }
+
+        .price {
+            font-weight: 700;
+            color: #16a34a;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<h1>🧾 ការបញ្ជាទិញលក់</h1>
+
+<nav>
+    <a href="/sales/products/">Products</a>
+    <a href="/sales/orders/">Orders</a>
+    <a href="{% url 'my_orders' %}">My Orders</a>
+    <a href="/sales/orders/new/">＋ New Order</a>
+    <a href="/admin/">Admin</a>
+
+    <span style="float:right">
+        👤 {{ request.user.username }}
+        <form method="post" action="/accounts/logout/" style="display:inline">
+            {% csrf_token %}
+            <button type="submit"
+                    style="background:none;border:none;color:#2563eb;font-weight:600;cursor:pointer;">
+                Log Out
+            </button>
+        </form>
+    </span>
+</nav>
+
+<div class="info">
+    {{ orders|length }} ការបញ្ជាទិញ បានកត់ត្រា
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Cashier</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Total</th>
+            <th>Items</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+    {% for order in orders %}
+    <tr>
+        <td>#{{ order.pk }}</td>
+        <td>{{ order.cashier }}</td>
+        <td>{{ order.created_at|date:"d M Y, H:i" }}</td>
+
+        <td>
+            <span class="{{ order.status }}">
+                {{ order.get_status_display }}
+            </span>
+        </td>
+
+        <td class="price">${{ order.total }}</td>
+        <td>{{ order.items.count }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="6" class="empty">
+            មិនទាន់មានការបញ្ជាទិញ
+        </td>
+    </tr>
+    {% endfor %}
+
+    </tbody>
+</table>
+
+</body>
+</html>

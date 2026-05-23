@@ -1,0 +1,254 @@
+<!-- sales/templates/sales/product_detail.html -->
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <title>🛒 POS — {{ product.name }}</title>
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+            background: #f0f4f8;
+            font-weight: 500;
+        }
+
+        h1 {
+            color: #1a202c;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-weight: 700;
+            color: #111827;
+        }
+
+        nav a {
+            margin-right: 16px;
+            color: #2b6cb0;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        .detail-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+        }
+
+        .left { flex: 1; }
+
+        .right {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .product-img {
+            max-width: 320px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease;
+            cursor: zoom-in;
+        }
+
+        .product-img:hover {
+            transform: scale(1.12);
+        }
+
+        .no-image {
+            width: 300px;
+            height: 250px;
+            border: 2px dashed #bbb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #555;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 12px;
+            font-size: 0.9em;
+            background: #ebf8ff;
+            color: #1d4ed8;
+            font-weight: 700;
+        }
+
+        .price {
+            font-size: 2em;
+            font-weight: 700;
+            color: #276749;
+            margin: 10px 0;
+        }
+
+        .stock {
+            font-size: 1.1em;
+            color: #374151;
+            font-weight: 600;
+            margin: 10px 0;
+        }
+
+        .low {
+            color: #dc2626;
+            font-weight: 700;
+        }
+
+        .info-row {
+            margin: 15px 0;
+            display: flex;
+            gap: 20px;
+        }
+
+        .info-label {
+            font-weight: 700;
+            color: #374151;
+            min-width: 150px;
+        }
+
+        .info-value {
+            color: #111827;
+            font-weight: 600;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin: 20px 0;
+            padding: 10px 20px;
+            background: #2b6cb0;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        /* LIGHTBOX */
+        #lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        #lightbox img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>🛒 ព័ត៌មានលម្អិតផលិតផល</h1>
+
+<nav>
+    <a href="/sales/products/">ផលិតផល</a>
+    <a href="/sales/orders/">ការបញ្ជាទិញ</a>
+    <a href="/admin/">Admin</a>
+</nav>
+
+<div class="detail-card">
+
+    <div class="left">
+
+        <h2>{{ product.name }}</h2>
+        <span class="badge">{{ product.get_category_display }}</span>
+
+        <div class="info-row">
+            <div class="info-label">តម្លៃ:</div>
+            <div class="info-value">
+                <p class="price">${{ product.price }}</p>
+            </div>
+        </div>
+
+        {% if product.barcode %}
+        <div class="info-row">
+            <div class="info-label">Barcode:</div>
+            <div class="info-value">{{ product.barcode }}</div>
+        </div>
+        {% endif %}
+
+        <div class="info-row">
+            <div class="info-label">ស្តុក:</div>
+            <div class="info-value">
+                {% if product.stock <= 5 %}
+                    <p class="low">⚠️ ស្តុកទាប: {{ product.stock }}</p>
+                {% else %}
+                    <p class="stock">{{ product.stock }} ឯកតា</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="info-row">
+            <div class="info-label">ស្ថានភាព:</div>
+            <div class="info-value">
+                {% if product.is_active %}
+                    <span style="color:#16a34a;font-weight:700;">✓ សកម្ម</span>
+                {% else %}
+                    <span style="color:#dc2626;font-weight:700;">✗ អសកម្ម</span>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+    <div class="right">
+        {% if product.image %}
+            <img class="product-img"
+                 src="{{ product.image.url }}"
+                 alt="{{ product.name }}"
+                 onclick="openLightbox(this)">
+        {% else %}
+            <div class="no-image">No Image</div>
+        {% endif %}
+    </div>
+
+</div>
+
+<a href="/sales/products/" class="back-link">← ត្រលប់ទៅបញ្ជីផលិតផល</a>
+
+<!-- LIGHTBOX -->
+<div id="lightbox" onclick="closeLightbox()">
+    <img id="lightbox-img">
+</div>
+
+<script>
+function openLightbox(img) {
+    const lb = document.getElementById("lightbox");
+    const lbImg = document.getElementById("lightbox-img");
+
+    lb.style.display = "flex";
+    lbImg.src = img.src;
+}
+
+function closeLightbox() {
+    document.getElementById("lightbox").style.display = "none";
+}
+</script>
+
+</body>
+</html>

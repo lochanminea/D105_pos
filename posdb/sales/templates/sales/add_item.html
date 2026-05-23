@@ -1,0 +1,271 @@
+<!-- sales/templates/sales/add_item.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Order #{{ order.pk }}</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            max-width: 900px;
+            margin: 40px auto;
+            background: #f4f7fb;
+            padding: 0 20px;
+            color: #111827;
+        }
+
+        h1 {
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-weight: 500;
+        }
+
+        /* CARD TABLE */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            margin-bottom: 20px;
+        }
+
+        th {
+            background: #2563eb;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            font-weight: 500;
+        }
+
+        tr:hover td {
+            background: #f3f4f6;
+        }
+
+        .total {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #16a34a;
+            margin: 10px 0;
+        }
+
+        /* FORM */
+        form.add {
+            background: white;
+            padding: 18px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 0.9em;
+            color: #374151;
+        }
+
+        input, select {
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: #2563eb;
+        }
+
+        /* BUTTONS */
+        .btn-add {
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 18px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-add:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-paid {
+            background: #16a34a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 18px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-paid:hover {
+            background: #15803d;
+        }
+
+        .btn-cancel {
+            background: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 18px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-cancel:hover {
+            background: #b91c1c;
+        }
+
+        /* ERROR */
+        .error-box {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .field-error {
+            color: #dc2626;
+            font-size: 0.85em;
+            margin-top: 4px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        /* HEADER CARD */
+        .header-card {
+            background: white;
+            padding: 15px 18px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 15px;
+        }
+
+        .cashier {
+            color: #6b7280;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>🧾 Order #{{ order.pk }}</h1>
+
+<div class="header-card">
+    <p class="cashier">
+        Cashier: <strong>{{ order.cashier }}</strong>
+    </p>
+</div>
+
+<!-- Error -->
+{% if error_message %}
+<div class="error-box">
+    {{ error_message }}
+</div>
+{% endif %}
+
+<!-- TABLE -->
+<table>
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Qty</th>
+            <th>Unit Price</th>
+            <th>Subtotal</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for item in items %}
+        <tr>
+            <td>{{ item.product.name }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>${{ item.unit_price }}</td>
+            <td>${{ item.subtotal }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4" style="text-align:center;color:#6b7280;">
+                No items yet
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<p class="total">Order Total: ${{ order.total }}</p>
+
+<!-- FORM ONLY OPEN -->
+{% if order.status == 'open' %}
+
+<form class="add" method="post">
+    {% csrf_token %}
+
+    {% for field in item_form %}
+    <div>
+        <label>{{ field.label }}</label>
+        {{ field }}
+
+        {% if field.errors %}
+            <div class="field-error">{{ field.errors }}</div>
+        {% endif %}
+    </div>
+    {% endfor %}
+
+    <button class="btn-add" type="submit">＋ Add Item</button>
+</form>
+
+<!-- ACTIONS -->
+<div class="actions">
+
+    <form method="post">
+        {% csrf_token %}
+        <button class="btn-paid" name="mark_paid" type="submit">
+            ✔ Paid
+        </button>
+    </form>
+
+    <form method="post">
+        {% csrf_token %}
+        <button class="btn-cancel" name="cancel_order" type="submit">
+            ✖ Cancel
+        </button>
+    </form>
+
+</div>
+
+{% else %}
+
+<div class="error-box">
+    Order is {{ order.status }} and cannot be modified.
+</div>
+
+{% endif %}
+
+</body>
+</html>
