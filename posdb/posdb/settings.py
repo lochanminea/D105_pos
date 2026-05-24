@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-*q&@o6e@4wg1!xkzih(w)8@=ns#4(qhhr!4h9kh85&a322a3p3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['lochanminea.pythonanywhere.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -130,3 +130,11 @@ LOGOUT_REDIRECT_URL = '/accounts/login/'   # after logout → back to login page
 # With these settings + the root RedirectView, the full navigation cycle is:
 #   /  →  /accounts/login/  →  (log in)  →  /sales/products/
 #   (log out)  →  /accounts/login/
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://lochanminea.pythonanywhere.com'
+    'http://lochanminea.pythonanywhere.com'
+]
+
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
